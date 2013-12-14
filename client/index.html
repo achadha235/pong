@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<script src="js/socket.io.js"> </script>
+	</head>
+
+	<body>
+
+
+	</body>
+</html>
+
+</style>
+
+<script>
+
+	var data = {
+		p1: 0,
+		p2: 0,
+		p3: 0,
+		p4: 0,
+
+		ball: {x: 200, y: 200}
+	}
+
+	var socket = io.connect('http://localhost:3000');
+	socket.on('init', function (packet){
+		console.log(packet);
+	})
+
+	var leftPressed = false;
+	var rightPressed = true;
+
+	window.addEventListener('keydown', function (e) {
+    	if (e.keyCode === 37) {
+    		leftPressed = true;
+	        socket.emit('moveLeft', {});
+	    }
+	    else if (e.keyCode === 39){
+	    	rightPressed = true;
+	    	socket.emit('moveRight', {});
+	    }
+	}, false);
+
+	window.addEventListener('keyup', function (e) {
+    	if (e.keyCode === 37) {
+    		leftPressed = false;
+	        socket.emit('stopMoveLeft', {});
+	    }
+	    else if (e.keyCode === 39){
+	    	rightPressed = false;
+	    	socket.emit('stopMoveRight', {});
+	    }
+	}, false);
+
+
+</script>
