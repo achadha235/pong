@@ -39,6 +39,7 @@
 			ballOutOfBounds: 	false,
 			paddle_speed: 		0,
 			ballOutOfBounds: 	false,
+			p_color: ["#F0F000","#00F0F0","#F000F0","#00FF00"],
 			paddle_width: 100,//px
 			paddle_height: 20,//px
 			ball_radius: 5,//px
@@ -113,19 +114,19 @@
 
 		function drawPaddles(){//p1_x p1_y ...
 			//Paddle 1
-			ctx.fillStyle="#F0F000";
+			ctx.fillStyle=game_param.p_color[playerNumber];
 			ctx.fillRect(data.positions[playerNumber], game_param.ypositions[0], game_param.paddle_width, game_param.paddle_height);
 
 			//Paddle 2
-			ctx.fillStyle="#00F0F0";
+			ctx.fillStyle=game_param.p_color[(playerNumber+1)%4];
 			ctx.fillRect(game_param.ypositions[1], game_param.bottom_wall-game_param.paddle_width-data.positions[(playerNumber+1)%4], game_param.paddle_height, game_param.paddle_width);
 
 			//Paddle 3
-			ctx.fillStyle="#F000F0";
+			ctx.fillStyle=game_param.p_color[(playerNumber+2)%4];
 			ctx.fillRect(game_param.right_wall-game_param.paddle_width-data.positions[(playerNumber+2)%4], game_param.ypositions[2], game_param.paddle_width, game_param.paddle_height);
 
 			//Paddle 4
-			ctx.fillStyle="#00FF00";
+			ctx.fillStyle=game_param.p_color[(playerNumber+3)%4];
 			ctx.fillRect(game_param.ypositions[3], data.positions[(playerNumber+3)%4], game_param.paddle_height, game_param.paddle_width);
 		}
 
