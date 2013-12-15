@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+
+</head>
+<body>
+	<canvas id="myCanvas" width="400" height="400"></canvas>
+	<script>
+		function init_game(){
+			p1_x = 150;
+			p1_y = 380;
+			p2_x = 380;
+			p2_y = 150;
+			p3_x = 150;
+			p3_y = 0;
+			p4_x = 0;
+			p4_y = 150;
+			ball_x = 195;
+			ball_y = 195;
+			mov_x = 1;
+			mov_y = 2;
+			ballOutOfBounds = false;
+			paddle_speed = 0;
+		}
+		var c=document.getElementById("myCanvas");
+		var ctx=c.getContext("2d");
+		var paddle_width = 100;//px
+		var paddle_height = 20;//px
+		var ball_radius = 5;//px
+		var right_wall = 400;
+		var bottom_wall = 400;
+		var p_left_boundary = 50;
+		var p_right_boundary = 350;
+		var p1_x = 150;
+		var p1_y = 380;
+		var p2_x = 380;
+		var p2_y = 150;
+		var p3_x = 150;
+		var p3_y = 0;
+		var p4_x = 0;
+		var p4_y = 150;
+		var ball_x = 195;
+		var ball_y = 195;
+		var mov_x = 1;
+		var mov_y = 2;
+		var ballOutOfBounds = false;
+		var paddle_speed = 0;
+		var update = setInterval("updateAll()",10);
+		window.addEventListener('keydown', function (e){
+		    if (e.keyCode === 37) {//left arrow
+		       	paddle_speed = -5;
+		    }
+		    else if (e.keyCode === 39) {//right arrow
+		       	paddle_speed = 5;
+		    }
+		   
+		}, false);
+		window.addEventListener('keyup', function (e){
+
+		    paddle_speed = 0;
+		   
+		}, false);
+
+
+		function updateAll(){
+			drawAll();
+			movePaddle();
+			moveBall();
+			if(ballOutOfBounds){
+				init_game();
+			}
+		}
+		function drawAll()
+		{
+			drawBackground();
+			drawPaddles();
+			drawBall();
+		}
+
+		function drawBackground(){
+			ctx.fillStyle="#000000";
+			ctx.fillRect(0,0,400,400);
+		}
+
+		function drawPaddles(){//p1_x p1_y ...
+			//Paddle 1
+			ctx.fillStyle="#F0F000";
+			ctx.fillRect(p1_x, p1_y, paddle_width, paddle_height);
+
+			//Paddle 2
+			ctx.fillStyle="#00F0F0";
+			ctx.fillRect(p2_x, p2_y, paddle_height, paddle_width);
+
+			//Paddle 3
+			ctx.fillStyle="#F000F0";
+			ctx.fillRect(p3_x, p3_y, paddle_width, paddle_height);
+
+			//Paddle 4
+			ctx.fillStyle="#00FF00";
+			ctx.fillRect(p4_x, p4_y, paddle_height, paddle_width);
+		}
+
+		function drawBall(){//ball_x, ball_y....
+			ctx.beginPath();
+			ctx.arc(ball_x, ball_y, ball_radius, 0, Math.PI*2, true); 
+			ctx.closePath();
+			ctx.fillStyle = 'white';
+			ctx.fill();
+		}
+
+		function paddleMotionHandler(){
+			window.addEventListener('keydown', function(e){
+			    if (e.keyCode === 37) {//left arrow
+			       	paddle_speed = -5;
+			    }
+			    else if (e.keyCode === 39) {//right arrow
+			       	paddle_speed = 5;
+			    }
+			   
+			}, false);
+		}
+
+		function moveBall(){
+			ballOutOfBounds = false;
+			if (((ball_x - ball_radius + mov_x) <= 0) || ((ball_x + ball_radius + mov_x) >= right_wall)||
+				((ball_y - ball_radius + mov_y) <= 0) || ((ball_y + ball_radius + mov_y) >= bottom_wall)){
+				ballOutOfBounds = true;
+			}
+			if (!ballOutOfBounds){
+				if (((ball_x - ball_radius + mov_x) < paddle_height) && (mov_x<0) &&
+					(((ball_y >= p4_y) && (ball_y <= (p4_y + paddle_width)))||(ball_y<p_left_boundary) || (ball_y>(p_right_boundary))))
+					{
+						
+
+					mov_x *= -1;
+					ball_x = paddle_height;
+				}
+				else if(((ball_x + ball_radius + mov_x) > (right_wall-paddle_height)) && (mov_x>0) &&
+					(((ball_y >= p2_y) && (ball_y <= (p2_y + paddle_width)))||(ball_y<p_left_boundary) || (ball_y>p_right_boundary))){
+						
+
+					mov_x *= -1;
+					ball_x = right_wall-paddle_height;
+				}
+
+				else if (((ball_y - ball_radius + mov_y) < paddle_height) && (mov_y<0) &&
+					(((ball_x >= p3_x) && (ball_x <= (p3_x + paddle_width)))||(ball_x<p_left_boundary) || (ball_x>p_right_boundary))){
+						
+
+					mov_y *= -1;
+					ball_y = paddle_height;
+
+				}
+				else if (((ball_y + ball_radius + mov_y) > (bottom_wall-paddle_height)) && (mov_y>0) &&
+					(((ball_x >= p1_x) && (ball_x <= (p1_x + paddle_width)))||(ball_x<p_left_boundary) || (ball_x>p_right_boundary))){
+						
+
+					mov_y *= -1;
+					ball_y = bottom_wall-paddle_height;
+
+				}
+				else{
+					ball_y += mov_y;
+					ball_x += mov_x;
+				}
+			}
+		}
+
+
+
+		function movePaddle(){
+			if ((p1_x + paddle_width + paddle_speed) >= p_right_boundary) p1_x = (p_right_boundary - paddle_width);
+			else if	(p1_x <= (p_left_boundary - paddle_speed)) p1_x = p_left_boundary;
+			else p1_x += paddle_speed;
+		}
+
+
+	</script>
+</body>
+</html>
+
+
