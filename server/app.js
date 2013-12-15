@@ -86,8 +86,6 @@ function startGame(){
 }
 
 function updateBall(){
-
-
 	model.ball.x = model.ball.x + model.ball.dx;
 	model.ball.y = model.ball.y + model.ball.dy;
 
