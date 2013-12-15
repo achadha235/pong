@@ -3,6 +3,7 @@ var app = require('http').createServer(handler)
   , fs = require('fs')
 
 app.listen(3000);
+io.set('log level', 1); // reduce logging
 
 function handler (req, res) {
   fs.readFile(__dirname + '/index.html',
@@ -26,7 +27,7 @@ var model = {
 var numPlayers = 0;
 var players = [];
 var idHash = {};
-var velocity = 10;
+var velocity = 80;
 
 io.sockets.on('connection', function (socket) {
 	if (numPlayers < 4){ // Add Player
@@ -53,20 +54,21 @@ io.sockets.on('connection', function (socket) {
 
 function startGame(){
 	var step = 10;
-
-	setTimeout(function (){
+	setInterval(function (){
 		// Network Update loop 
 		io.sockets.emit('update', model)
 	}, 30)
 
-	setTimeout(function (){
+	setInterval(function (){
 		// Game Update loop 
 		for (var i = 0; i < 4; i++){
 			if (model.actions[i] === 1){
-				model.positions[i] = Math.max(0, model.positions[i] - (velocity * (step/1000)))
+				var newPos = Math.max(0, model.positions[i] - (velocity * (step/1000)))
+				model.positions[i] = Math.round(newPos);
 			}
 			else if (model.actions[i] === 2){
-				model.positions[i] = Math.min(400, model.positions[i] + (velocity * (step/1000)))
+				var newPos = Math.min(400, model.positions[i] + (velocity * (step/1000)));
+				model.positions[i] = Math.round(newPos);
 			}
 		}
 	}, 10)
