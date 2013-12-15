@@ -4,7 +4,7 @@
 	</head>
 
 	<body>
-
+		<div id='status'> </div>
 
 	</body>
 </html>
@@ -13,44 +13,51 @@
 
 <script>
 
-	var data = {
-		p1: 0,
-		p2: 0,
-		p3: 0,
-		p4: 0,
-
-		ball: {x: 200, y: 200}
-	}
-
+	var data ;
 	var socket = io.connect('http://localhost:3000');
-	socket.on('init', function (packet){
-		console.log(packet);
+
+	socket.on('update', function (model){
+		data = model;
+		console.log('updating model...');
+		updateTable();
 	})
 
 	var leftPressed = false;
-	var rightPressed = true;
+	var rightPressed = false;
 
 	window.addEventListener('keydown', function (e) {
-    	if (e.keyCode === 37) {
+    	if (e.keyCode === 37 && !leftPressed && !rightPressed) {
     		leftPressed = true;
 	        socket.emit('moveLeft', {});
+	        console.log('emmitting')
 	    }
-	    else if (e.keyCode === 39){
+	    else if (e.keyCode === 39  && !leftPressed && !rightPressed){
 	    	rightPressed = true;
 	    	socket.emit('moveRight', {});
+	        console.log('emmitting')
+
 	    }
 	}, false);
 
 	window.addEventListener('keyup', function (e) {
     	if (e.keyCode === 37) {
     		leftPressed = false;
-	        socket.emit('stopMoveLeft', {});
+	        socket.emit('stop', {});
+	        console.log('emmitting')
+
 	    }
 	    else if (e.keyCode === 39){
 	    	rightPressed = false;
-	    	socket.emit('stopMoveRight', {});
+	    	socket.emit('stop', {});
+	        console.log('emmitting')
+
 	    }
 	}, false);
+
+	function updateTable(){
+		console.log(data);
+		document.getElementById('status').innerHTML = JSON.stringify(data);
+	}
 
 
 </script>
