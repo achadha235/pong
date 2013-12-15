@@ -21,7 +21,7 @@ function handler (req, res) {
 var model = {
 	positions: [150, 150, 150, 150],
 	actions: [0, 0, 0, 0],
-	ball: {x: 200, y: 200, dx: 0, dy: 1}
+	ball: {x: 200, y: 200, dx: 1, dy: 0}
 }
 
 
@@ -48,6 +48,10 @@ io.sockets.on('connection', function (socket) {
 		numPlayers++;
 	}
 
+	if (numPlayers == 4){
+		startGame();
+	}
+
 	socket.on('moveLeft', function (){
 		model.actions[idHash[socket.id]] = 1;
 		io.sockets.emit('update', model);
@@ -60,7 +64,6 @@ io.sockets.on('connection', function (socket) {
 		model.actions[idHash[socket.id]] = 0;
 		io.sockets.emit('update', model);
 	})
-	startGame()
 });
 
 function startGame(){
@@ -107,12 +110,11 @@ function deflectBall(){
 	var left = model.ball.x - params.radius;
 	var right = model.ball.x + params.radius;
 
-	if (bottom <= params.height && bottom >= params.height - params.paddleHeight && model.ball.dy > 0){ // Range for delfection
+	if (bottom >= (params.height - params.paddleHeight) && model.ball.dy > 0){ // Range for delfection
 		if ((model.positions[0] <= model.ball.x &&  model.ball.x <= model.positions[0]+params.paddleWidth)) model.ball.dy *= -1; // Make sure paddle is 
 	}
-
-	else if (right <= params.width && right>= params.width - params.paddleHeight && model.ball.dx > 0){
-		if (((params.height-params.paddleWidth-model.positions[1]) <= model.ball.y &&  model.ball.y <= params.width-model.positions[1])) model.ball.dx *= -1;
+	else if (right>= params.width - params.paddleHeight && model.ball.dx > 0){
+		if (((params.height-params.paddleWidth-model.positions[1]) <= model.ball.y &&  model.ball.y <= params.height-model.positions[1])) model.ball.dx *= -1;
 	}
 	else if (top <= params.paddleHeight && top >= 0 && model.ball.dy < 0){
 		if (((params.width-params.paddleWidth-model.positions[2]) <= model.ball.x &&  model.ball.x <= params.width-model.positions[2])) model.ball.dy *= -1;

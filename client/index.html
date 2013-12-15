@@ -5,16 +5,10 @@
 
 	<body>
 		<div id='status'> </div>
-		<canvas id='myCanvas'> </canvas>
+		<canvas id="myCanvas" width="400" height="400"></canvas>
 	</body>
 </html>
 
-<style>
-	#myCanvas {
-		width: 400px;
-		height: 400px;
-	}
-</style>
 
 <script>
 
@@ -24,11 +18,24 @@
 	var ctx = canvas.getContext("2d");
 	var myPlayer;
 
+
+	var params = {
+		height: 400,
+		width: 400,
+		radius: 5,
+		border: 50,
+		paddleHeight: 10,
+		paddleWidth: 100,
+		colors: ["#F0F000","#00F0F0","#F000F0","#00FF00"],
+		ball: {x:200, y:200}
+	}
+
+
 	socket.on('update', function (model){
 		data = model;
 		console.log('updating model...');
 		updateTable();
-		drawCanvas();
+		drawAll();
 	})
 	socket.on('setPlayerNumber', function (assignment){
 		myPlayer = assignment.yourPlayerNumber
@@ -64,8 +71,66 @@
 		document.getElementById('status').innerHTML = JSON.stringify(data);
 	}
 
-	function drawCanvas(){
+
+	function drawAll() {
+		//console.log('drawAll');
+		drawBackground();
+		drawPaddles();
+		relBallPos();
+		drawBall();
+	}
+
+	function drawBackground(){
+		ctx.fillStyle="#000000";
 		ctx.fillRect(0, 0, 400, 400);
+	}
+
+	function drawPaddles(){//p1_x p1_y ...
+		//Paddle 0
+		console.log('Drawing paddles')
+		ctx.fillStyle=params.colors[myPlayer];
+		ctx.fillRect(data.positions[myPlayer], params.height-params.paddleHeight, params.paddleWidth, params.paddleHeight);
+
+		//Paddle 1
+		ctx.fillStyle=params.colors[(myPlayer+1)%4];
+		ctx.fillRect(params.width-params.paddleHeight, params.height-params.paddleWidth-data.positions[(myPlayer+1)%4], params.paddleHeight, params.paddleWidth);
+
+		//Paddle 2
+		ctx.fillStyle= params.colors[(myPlayer+2)%4];
+		ctx.fillRect(params.width-params.paddleWidth-data.positions[(myPlayer+2)%4], 0, params.paddleWidth, params.paddleHeight);
+
+		//Paddle 3
+		ctx.fillStyle=params.colors[(myPlayer+3)%4];
+		ctx.fillRect(0, data.positions[(myPlayer+3)%4], params.paddleHeight, params.paddleWidth);
+	}
+
+	function drawBall(){//data.ball.x, data.ball.y....
+		ctx.beginPath();
+		ctx.arc(params.ball.x, params.ball.y, params.radius, 0, Math.PI*2, true); 
+		ctx.closePath();
+		ctx.fillStyle = 'white';
+		ctx.fill();
+	}
+
+	function relBallPos(){
+		switch(myPlayer){
+			case 0:
+				params.ball.x = data.ball.x;
+				params.ball.y = data.ball.y;
+				break;
+			case 1:
+				params.ball.x = params.height-data.ball.y;
+				params.ball.y = data.ball.x;
+				break;
+			case 2:
+				params.ball.x = params.width-data.ball.x;
+				params.ball.y = params.height-data.ball.y;
+				break;
+			case 3:
+				params.ball.x = data.ball.y;
+				params.ball.y = params.width-data.ball.x;
+				break;
+		}
 	}
 
 </script>
