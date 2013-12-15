@@ -5,21 +5,33 @@
 
 	<body>
 		<div id='status'> </div>
-
+		<canvas id='myCanvas'> </canvas>
 	</body>
 </html>
 
+<style>
+	#myCanvas {
+		width: 400px;
+		height: 400px;
+	}
 </style>
 
 <script>
 
 	var data ;
 	var socket = io.connect('http://localhost:3000');
+	var canvas = document.getElementById('myCanvas');
+	var ctx = canvas.getContext("2d");
+	var myPlayer;
 
 	socket.on('update', function (model){
 		data = model;
 		console.log('updating model...');
 		updateTable();
+		drawCanvas();
+	})
+	socket.on('setPlayerNumber', function (assignment){
+		myPlayer = assignment.yourPlayerNumber
 	})
 
 	var leftPressed = false;
@@ -29,13 +41,10 @@
     	if (e.keyCode === 37 && !leftPressed && !rightPressed) {
     		leftPressed = true;
 	        socket.emit('moveLeft', {});
-	        console.log('emmitting')
 	    }
 	    else if (e.keyCode === 39  && !leftPressed && !rightPressed){
 	    	rightPressed = true;
 	    	socket.emit('moveRight', {});
-	        console.log('emmitting')
-
 	    }
 	}, false);
 
@@ -43,14 +52,10 @@
     	if (e.keyCode === 37) {
     		leftPressed = false;
 	        socket.emit('stop', {});
-	        console.log('emmitting')
-
 	    }
 	    else if (e.keyCode === 39){
 	    	rightPressed = false;
 	    	socket.emit('stop', {});
-	        console.log('emmitting')
-
 	    }
 	}, false);
 
@@ -59,5 +64,8 @@
 		document.getElementById('status').innerHTML = JSON.stringify(data);
 	}
 
+	function drawCanvas(){
+		ctx.fillRect(0, 0, 400, 400);
+	}
 
 </script>

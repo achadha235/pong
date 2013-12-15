@@ -122,7 +122,7 @@ function updateBall(){
 		// RESET
 		deflectBall()
 
-	} else {
+	} else { 
 		console.log(outOfBounds);
 	}
 }
