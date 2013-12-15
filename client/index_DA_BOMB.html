@@ -48,7 +48,11 @@
 			p_left_boundary: 50,
 			p_right_boundary: 250,
 			leftpressed: false,
-			rightpressed: false
+			rightpressed: false,
+			ball: {
+				x: 150,
+				y: 150
+			}
 		}
 
 
@@ -61,13 +65,13 @@
     		game_param.leftpressed = true;
 	        socket.emit('moveLeft', {});
 	        //console.log('emmitting')
-	        game_param.paddle_speed = -5;
+	        game_param.paddle_speed = 1;
 	    }
 	    else if (e.keyCode === 39  && !game_param.leftpressed && !game_param.rightpressed){
 	    	game_param.rightpressed = true;
 	    	socket.emit('moveRight', {});
 	        //console.log('emmitting')
-	        game_param.paddle_speed = 5;
+	        game_param.paddle_speed = 2;
 
 	    }
 	}, false);
@@ -94,6 +98,7 @@
 			//console.log(data);
 			drawAll();
 			movePaddle();
+			relBallPos();
 			moveBall();
 			if(game_param.ballOutOfBounds){
 				init_game();
@@ -132,54 +137,54 @@
 
 		function drawBall(){//data.ball.x, data.ball.y....
 			ctx.beginPath();
-			ctx.arc(data.ball.x, data.ball.y, game_param.ball_radius, 0, Math.PI*2, true); 
+			ctx.arc(game_param.ball.x, game_param.ball.y, game_param.ball_radius, 0, Math.PI*2, true); 
 			ctx.closePath();
 			ctx.fillStyle = 'white';
 			ctx.fill();
 		}
-
+/*
 		function moveBall(){
 			game_param.ballOutOfBounds = false;
-			if (((data.ball.x - game_param.ball_radius + data.ball.dx) <= 0) || ((data.ball.x + game_param.ball_radius + data.ball.dx) >= game_param.right_wall)||
-				((data.ball.y - game_param.ball_radius + data.ball.dy) <= 0) || ((data.ball.y + game_param.ball_radius + data.ball.dy) >= game_param.bottom_wall)){
+			if (((game_param.ball.x - game_param.ball_radius + data.ball.dx) <= 0) || ((game_param.ball.x + game_param.ball_radius + data.ball.dx) >= game_param.right_wall)||
+				((game_param.ball.y - game_param.ball_radius + data.ball.dy) <= 0) || ((game_param.ball.y + game_param.ball_radius + data.ball.dy) >= game_param.bottom_wall)){
 				game_param.ballOutOfBounds = true;
 			}
 			if (!game_param.ballOutOfBounds){
-				if (((data.ball.x - game_param.ball_radius + data.ball.dx) < game_param.paddle_height) && (data.ball.dx<0) &&
-					(((data.ball.y >= game_param.ypositions[3]) && (data.ball.y <= (game_param.ypositions[3] + game_param.paddle_width)))||(data.ball.y<game_param.p_left_boundary) || (data.ball.y>(game_param.p_right_boundary))))
+				if (((game_param.ball.x - game_param.ball_radius + data.ball.dx) < game_param.paddle_height) && (data.ball.dx<0) &&
+					(((game_param.ball.y >= game_param.ypositions[3]) && (game_param.ball.y <= (game_param.ypositions[3] + game_param.paddle_width)))||(game_param.ball.y<game_param.p_left_boundary) || (game_param.ball.y>(game_param.p_right_boundary))))
 					{
 						
 
 					data.ball.dx *= -1;
-					data.ball.x = game_param.paddle_height;
+					game_param.ball.x = game_param.paddle_height;
 				}
-				else if(((data.ball.x + game_param.ball_radius + data.ball.dx) > (game_param.right_wall-game_param.paddle_height)) && (data.ball.dx>0) &&
-					(((data.ball.y >= game_param.ypositions[1]) && (data.ball.y <= (game_param.ypositions[1] + game_param.paddle_width)))||(data.ball.y<game_param.p_left_boundary) || (data.ball.y>game_param.p_right_boundary))){
+				else if(((game_param.ball.x + game_param.ball_radius + data.ball.dx) > (game_param.right_wall-game_param.paddle_height)) && (data.ball.dx>0) &&
+					(((game_param.ball.y >= game_param.ypositions[1]) && (game_param.ball.y <= (game_param.ypositions[1] + game_param.paddle_width)))||(game_param.ball.y<game_param.p_left_boundary) || (game_param.ball.y>game_param.p_right_boundary))){
 						
 
 					data.ball.dx *= -1;
-					data.ball.x = game_param.right_wall-game_param.paddle_height;
+					game_param.ball.x = game_param.right_wall-game_param.paddle_height;
 				}
 
-				else if (((data.ball.y - game_param.ball_radius + data.ball.dy) < game_param.paddle_height) && (data.ball.dy<0) &&
-					(((data.ball.x >= game_param.ypositions[2]) && (data.ball.x <= (game_param.ypositions[2] + game_param.paddle_width)))||(data.ball.x<game_param.p_left_boundary) || (data.ball.x>game_param.p_right_boundary))){
+				else if (((game_param.ball.y - game_param.ball_radius + data.ball.dy) < game_param.paddle_height) && (data.ball.dy<0) &&
+					(((game_param.ball.x >= game_param.ypositions[2]) && (game_param.ball.x <= (game_param.ypositions[2] + game_param.paddle_width)))||(game_param.ball.x<game_param.p_left_boundary) || (game_param.ball.x>game_param.p_right_boundary))){
 						
 
 					data.ball.dy *= -1;
-					data.ball.y = game_param.paddle_height;
+					game_param.ball.y = game_param.paddle_height;
 
 				}
-				else if (((data.ball.y + game_param.ball_radius + data.ball.dy) > (game_param.bottom_wall-game_param.paddle_height)) && (data.ball.dy>0) &&
-					(((data.ball.x >= game_param.ypositions[0]) && (data.ball.x <= (game_param.ypositions[0] + game_param.paddle_width)))||(data.ball.x<game_param.p_left_boundary) || (data.ball.x>game_param.p_right_boundary))){
+				else if (((game_param.ball.y + game_param.ball_radius + data.ball.dy) > (game_param.bottom_wall-game_param.paddle_height)) && (data.ball.dy>0) &&
+					(((game_param.ball.x >= game_param.ypositions[0]) && (game_param.ball.x <= (game_param.ypositions[0] + game_param.paddle_width)))||(game_param.ball.x<game_param.p_left_boundary) || (game_param.ball.x>game_param.p_right_boundary))){
 						
 
 					data.ball.dy *= -1;
-					data.ball.y = game_param.bottom_wall-game_param.paddle_height;
+					game_param.ball.y = game_param.bottom_wall-game_param.paddle_height;
 
 				}
 				else{
-					data.ball.y += data.ball.dy;
-					data.ball.x += data.ball.dx;
+					game_param.ball.y += data.ball.dy;
+					game_param.ball.x += data.ball.dx;
 				}
 			}
 		}
@@ -187,11 +192,47 @@
 
 
 		function movePaddle(){
-			if ((data.positions[playerNumber] + game_param.paddle_width + game_param.paddle_speed) >= game_param.p_right_boundary) data.positions[playerNumber] = (game_param.p_right_boundary - game_param.paddle_width);
+			if ((data.positions[playerNumber] + game_param.paddle_width + game_param.paddle_speed) >= game_param.p_right_boundary) data.positions[playerNumber] = Math.max(50, data.positions[i] - (velocity * (step/1000)))//(game_param.p_right_boundary - game_param.paddle_width);
 			else if	(data.positions[playerNumber] <= (game_param.p_left_boundary - game_param.paddle_speed)) data.positions[playerNumber] = game_param.p_left_boundary;
 			else data.positions[playerNumber] += game_param.paddle_speed;
 		}
+*/
+		function movePaddle(){
+			velocity = 80;
+			step = 10;
+			
+			if (game_param.paddle_speed === 1){
+				var newPos = Math.max(50, data.positions[playerNumber] - (velocity * (step/1000)))
+				data.positions[playerNumber] = Math.round(newPos);
+			}
+			else if (game_param.paddle_speed === 2){
+				var newPos = Math.min(150, data.positions[playerNumber] + (velocity * (step/1000)));
+				data.positions[playerNumber] = Math.round(newPos);
+			}
+			
+		}
+		
 
+		function relBallPos(){
+			switch(playerNumber){
+				case 0:
+					game_param.ball.x = data.ball.x;
+					game_param.ball.y = data.ball.y;
+					break;
+				case 1:
+					game_param.ball.x = game_param.bottom_wall-data.ball.y;
+					game_param.ball.y = data.ball.x;
+					break;
+				case 2:
+					game_param.ball.x = game_param.right_wall-data.ball.x;
+					game_param.ball.y = game_param.bottom_wall-data.ball.y;
+					break;
+				case 3:
+					game_param.ball.x = data.ball.y;
+					game_param.ball.y = game_param.right_wall-data.ball.x;
+					break;
+			}
+		}
 
 	</script>
 </body>
