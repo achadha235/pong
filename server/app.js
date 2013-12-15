@@ -31,7 +31,7 @@ var velocity = 80;
 
 io.sockets.on('connection', function (socket) {
 	if (numPlayers < 4){ // Add Player
-		socket.emit('init', {test: "Hello World!"});
+		socket.emit('setPlayerNumber', {yourPlayerNumber: numPlayers});
 		idHash[socket.id] = numPlayers;
 		players.push(socket);
 		numPlayers++;
