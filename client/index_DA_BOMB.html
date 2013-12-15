@@ -1,77 +1,106 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-
+	<script src="js/socket.io.js"> </script>
 </head>
 <body>
-	<canvas id="myCanvas" width="400" height="400"></canvas>
+	<canvas id="myCanvas" width="300" height="300"></canvas>
+
 	<script>
-		function init_game(){
-			p1_x = 150;
-			p1_y = 380;
-			p2_x = 380;
-			p2_y = 150;
-			p3_x = 150;
-			p3_y = 0;
-			p4_x = 0;
-			p4_y = 150;
-			ball_x = 195;
-			ball_y = 195;
-			mov_x = 1;
-			mov_y = 2;
-			ballOutOfBounds = false;
-			paddle_speed = 0;
+		var data;
+		/*var data = {
+			positions: [100, 100, 100, 100],
+			actions: [0, 0, 0, 0],
+			ball: {x: 200, y: 200, dx: 0, dy: 0}
+		}*/
+		var playerNumber;
+		var game_started = false;
+		var socket = io.connect('http://localhost:3000');
+
+		socket.on('update', function (model){
+			data = model;
+			if (!game_started){
+				update = setInterval("updateAll()",10);
+				game_started = true;
+			}
+
+		});
+
+		socket.on('setPlayerNumber', function (playerAssign){
+			playerNumber = playerAssign.yourPlayerNumber;
+
+		});
+
+
+
+
+		var game_param = {
+			ypositions: [280, 280, 0, 0],
+			ballOutOfBounds: 	false,
+			paddle_speed: 		0,
+			ballOutOfBounds: 	false,
+			paddle_width: 100,//px
+			paddle_height: 20,//px
+			ball_radius: 5,//px
+			right_wall: 300,
+			bottom_wall: 300,
+			p_left_boundary: 50,
+			p_right_boundary: 250,
+			leftpressed: false,
+			rightpressed: false
 		}
+
+
 		var c=document.getElementById("myCanvas");
 		var ctx=c.getContext("2d");
-		var paddle_width = 100;//px
-		var paddle_height = 20;//px
-		var ball_radius = 5;//px
-		var right_wall = 400;
-		var bottom_wall = 400;
-		var p_left_boundary = 50;
-		var p_right_boundary = 350;
-		var p1_x = 150;
-		var p1_y = 380;
-		var p2_x = 380;
-		var p2_y = 150;
-		var p3_x = 150;
-		var p3_y = 0;
-		var p4_x = 0;
-		var p4_y = 150;
-		var ball_x = 195;
-		var ball_y = 195;
-		var mov_x = 1;
-		var mov_y = 2;
-		var ballOutOfBounds = false;
-		var paddle_speed = 0;
-		var update = setInterval("updateAll()",10);
-		window.addEventListener('keydown', function (e){
-		    if (e.keyCode === 37) {//left arrow
-		       	paddle_speed = -5;
-		    }
-		    else if (e.keyCode === 39) {//right arrow
-		       	paddle_speed = 5;
-		    }
-		   
-		}, false);
-		window.addEventListener('keyup', function (e){
+		
 
-		    paddle_speed = 0;
-		   
-		}, false);
+		window.addEventListener('keydown', function (e) {
+    	if (e.keyCode === 37 && !game_param.leftpressed && !game_param.rightpressed) {
+    		game_param.leftpressed = true;
+	        socket.emit('moveLeft', {});
+	        //console.log('emmitting')
+	        game_param.paddle_speed = -5;
+	    }
+	    else if (e.keyCode === 39  && !game_param.leftpressed && !game_param.rightpressed){
+	    	game_param.rightpressed = true;
+	    	socket.emit('moveRight', {});
+	        //console.log('emmitting')
+	        game_param.paddle_speed = 5;
+
+	    }
+	}, false);
+
+	window.addEventListener('keyup', function (e) {
+    	if (e.keyCode === 37) {
+    		game_param.leftpressed = false;
+	        socket.emit('stop', {});
+	        //console.log('emmitting')
+	        game_param.paddle_speed = 0;
+
+	    }
+	    else if (e.keyCode === 39){
+	    	game_param.rightpressed = false;
+	    	socket.emit('stop', {});
+	        //console.log('emmitting')
+	        game_param.paddle_speed = 0;
+
+	    }
+	}, false);
 
 
 		function updateAll(){
+			//console.log(data);
 			drawAll();
 			movePaddle();
 			moveBall();
-			if(ballOutOfBounds){
+			if(game_param.ballOutOfBounds){
 				init_game();
 			}
 		}
 		function drawAll()
 		{
+			//console.log('drawAll');
 			drawBackground();
 			drawPaddles();
 			drawBall();
@@ -85,83 +114,71 @@
 		function drawPaddles(){//p1_x p1_y ...
 			//Paddle 1
 			ctx.fillStyle="#F0F000";
-			ctx.fillRect(p1_x, p1_y, paddle_width, paddle_height);
+			ctx.fillRect(data.positions[playerNumber], game_param.ypositions[0], game_param.paddle_width, game_param.paddle_height);
 
 			//Paddle 2
 			ctx.fillStyle="#00F0F0";
-			ctx.fillRect(p2_x, p2_y, paddle_height, paddle_width);
+			ctx.fillRect(game_param.ypositions[1], data.positions[(playerNumber+1)%4], game_param.paddle_height, game_param.paddle_width);
 
 			//Paddle 3
 			ctx.fillStyle="#F000F0";
-			ctx.fillRect(p3_x, p3_y, paddle_width, paddle_height);
+			ctx.fillRect(data.positions[(playerNumber+2)%4], game_param.ypositions[2], game_param.paddle_width, game_param.paddle_height);
 
 			//Paddle 4
 			ctx.fillStyle="#00FF00";
-			ctx.fillRect(p4_x, p4_y, paddle_height, paddle_width);
+			ctx.fillRect(game_param.ypositions[3], data.positions[(playerNumber+3)%4], game_param.paddle_height, game_param.paddle_width);
 		}
 
-		function drawBall(){//ball_x, ball_y....
+		function drawBall(){//data.ball.x, data.ball.y....
 			ctx.beginPath();
-			ctx.arc(ball_x, ball_y, ball_radius, 0, Math.PI*2, true); 
+			ctx.arc(data.ball.x, data.ball.y, game_param.ball_radius, 0, Math.PI*2, true); 
 			ctx.closePath();
 			ctx.fillStyle = 'white';
 			ctx.fill();
 		}
 
-		function paddleMotionHandler(){
-			window.addEventListener('keydown', function(e){
-			    if (e.keyCode === 37) {//left arrow
-			       	paddle_speed = -5;
-			    }
-			    else if (e.keyCode === 39) {//right arrow
-			       	paddle_speed = 5;
-			    }
-			   
-			}, false);
-		}
-
 		function moveBall(){
-			ballOutOfBounds = false;
-			if (((ball_x - ball_radius + mov_x) <= 0) || ((ball_x + ball_radius + mov_x) >= right_wall)||
-				((ball_y - ball_radius + mov_y) <= 0) || ((ball_y + ball_radius + mov_y) >= bottom_wall)){
-				ballOutOfBounds = true;
+			game_param.ballOutOfBounds = false;
+			if (((data.ball.x - game_param.ball_radius + data.ball.dx) <= 0) || ((data.ball.x + game_param.ball_radius + data.ball.dx) >= game_param.right_wall)||
+				((data.ball.y - game_param.ball_radius + data.ball.dy) <= 0) || ((data.ball.y + game_param.ball_radius + data.ball.dy) >= game_param.bottom_wall)){
+				game_param.ballOutOfBounds = true;
 			}
-			if (!ballOutOfBounds){
-				if (((ball_x - ball_radius + mov_x) < paddle_height) && (mov_x<0) &&
-					(((ball_y >= p4_y) && (ball_y <= (p4_y + paddle_width)))||(ball_y<p_left_boundary) || (ball_y>(p_right_boundary))))
+			if (!game_param.ballOutOfBounds){
+				if (((data.ball.x - game_param.ball_radius + data.ball.dx) < game_param.paddle_height) && (data.ball.dx<0) &&
+					(((data.ball.y >= game_param.ypositions[3]) && (data.ball.y <= (game_param.ypositions[3] + game_param.paddle_width)))||(data.ball.y<game_param.p_left_boundary) || (data.ball.y>(game_param.p_right_boundary))))
 					{
 						
 
-					mov_x *= -1;
-					ball_x = paddle_height;
+					data.ball.dx *= -1;
+					data.ball.x = game_param.paddle_height;
 				}
-				else if(((ball_x + ball_radius + mov_x) > (right_wall-paddle_height)) && (mov_x>0) &&
-					(((ball_y >= p2_y) && (ball_y <= (p2_y + paddle_width)))||(ball_y<p_left_boundary) || (ball_y>p_right_boundary))){
+				else if(((data.ball.x + game_param.ball_radius + data.ball.dx) > (game_param.right_wall-game_param.paddle_height)) && (data.ball.dx>0) &&
+					(((data.ball.y >= game_param.ypositions[1]) && (data.ball.y <= (game_param.ypositions[1] + game_param.paddle_width)))||(data.ball.y<game_param.p_left_boundary) || (data.ball.y>game_param.p_right_boundary))){
 						
 
-					mov_x *= -1;
-					ball_x = right_wall-paddle_height;
+					data.ball.dx *= -1;
+					data.ball.x = game_param.right_wall-game_param.paddle_height;
 				}
 
-				else if (((ball_y - ball_radius + mov_y) < paddle_height) && (mov_y<0) &&
-					(((ball_x >= p3_x) && (ball_x <= (p3_x + paddle_width)))||(ball_x<p_left_boundary) || (ball_x>p_right_boundary))){
+				else if (((data.ball.y - game_param.ball_radius + data.ball.dy) < game_param.paddle_height) && (data.ball.dy<0) &&
+					(((data.ball.x >= game_param.ypositions[2]) && (data.ball.x <= (game_param.ypositions[2] + game_param.paddle_width)))||(data.ball.x<game_param.p_left_boundary) || (data.ball.x>game_param.p_right_boundary))){
 						
 
-					mov_y *= -1;
-					ball_y = paddle_height;
+					data.ball.dy *= -1;
+					data.ball.y = game_param.paddle_height;
 
 				}
-				else if (((ball_y + ball_radius + mov_y) > (bottom_wall-paddle_height)) && (mov_y>0) &&
-					(((ball_x >= p1_x) && (ball_x <= (p1_x + paddle_width)))||(ball_x<p_left_boundary) || (ball_x>p_right_boundary))){
+				else if (((data.ball.y + game_param.ball_radius + data.ball.dy) > (game_param.bottom_wall-game_param.paddle_height)) && (data.ball.dy>0) &&
+					(((data.ball.x >= game_param.ypositions[0]) && (data.ball.x <= (game_param.ypositions[0] + game_param.paddle_width)))||(data.ball.x<game_param.p_left_boundary) || (data.ball.x>game_param.p_right_boundary))){
 						
 
-					mov_y *= -1;
-					ball_y = bottom_wall-paddle_height;
+					data.ball.dy *= -1;
+					data.ball.y = game_param.bottom_wall-game_param.paddle_height;
 
 				}
 				else{
-					ball_y += mov_y;
-					ball_x += mov_x;
+					data.ball.y += data.ball.dy;
+					data.ball.x += data.ball.dx;
 				}
 			}
 		}
@@ -169,9 +186,9 @@
 
 
 		function movePaddle(){
-			if ((p1_x + paddle_width + paddle_speed) >= p_right_boundary) p1_x = (p_right_boundary - paddle_width);
-			else if	(p1_x <= (p_left_boundary - paddle_speed)) p1_x = p_left_boundary;
-			else p1_x += paddle_speed;
+			if ((data.positions[playerNumber] + game_param.paddle_width + game_param.paddle_speed) >= game_param.p_right_boundary) data.positions[playerNumber] = (game_param.p_right_boundary - game_param.paddle_width);
+			else if	(data.positions[playerNumber] <= (game_param.p_left_boundary - game_param.paddle_speed)) data.positions[playerNumber] = game_param.p_left_boundary;
+			else data.positions[playerNumber] += game_param.paddle_speed;
 		}
 
 
