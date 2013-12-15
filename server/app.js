@@ -24,7 +24,7 @@ var model = {
 	ball: {x: 200, y: 200, dx: 0, dy: 1}
 }
 
-<<<<<<< Updated upstream
+
 var params = {
 	height: 400,
 	width: 400,
@@ -32,27 +32,6 @@ var params = {
 	border: 50,
 	paddleHeight: 10,
 	paddleWidth: 100
-=======
-var game_param = {
-	ypositions: [280, 280, 0, 0],
-	ballOutOfBounds: 	false,
-	paddle_speed: 		0,
-	ballOutOfBounds: 	false,
-	p_color: ["#F0F000","#00F0F0","#F000F0","#00FF00"],
-	paddle_width: 100,//px
-	paddle_height: 20,//px
-	ball_radius: 5,//px
-	right_wall: 300,
-	bottom_wall: 300,
-	p_left_boundary: 50,
-	p_right_boundary: 250,
-	leftpressed: false,
-	rightpressed: false,
-	ball: {
-		x: 150,
-		y: 150
-	}
->>>>>>> Stashed changes
 }
 
 var numPlayers = 0;
@@ -103,13 +82,8 @@ function startGame(){
 				model.positions[i] = Math.round(newPos);
 			}
 		}
-<<<<<<< Updated upstream
 		updateBall();
-=======
 
-		moveBall();
-
->>>>>>> Stashed changes
 	}, 10)
 }
 
@@ -133,7 +107,6 @@ function deflectBall(){
 	var left = model.ball.x - params.radius;
 	var right = model.ball.x + params.radius;
 
-<<<<<<< Updated upstream
 	if (bottom <= params.height && bottom >= params.height - params.paddleHeight && model.ball.dy > 0){ // Range for delfection
 		if ((model.positions[0] <= model.ball.x &&  model.ball.x <= model.positions[0]+params.paddleWidth)) model.ball.dy *= -1; // Make sure paddle is 
 	}
@@ -162,56 +135,4 @@ function ballOutOfBounds(){
 	else if (bottom >= params.height) return 1
 	else return 0
 }
-=======
 
-	function moveBall(){
-		game_param.ballOutOfBounds = false;
-
-		if (((model.ball.x - game_param.ball_radius + model.ball.dx) <= 0) || ((model.ball.x + game_param.ball_radius + model.ball.dx) >= game_param.right_wall)||
-			((model.ball.y - game_param.ball_radius + model.ball.dy) <= 0) || ((model.ball.y + game_param.ball_radius + model.ball.dy) >= game_param.bottom_wall)){
-			game_param.ballOutOfBounds = true;
-		}
-		if (!game_param.ballOutOfBounds){
-			if (((model.ball.x - game_param.ball_radius + model.ball.dx) < game_param.paddle_height) && (model.ball.dx<0) &&
-				(((model.ball.y >= model.positions[3]) && (model.ball.y <= (model.positions[3] + game_param.paddle_width)))||(model.ball.y<game_param.p_left_boundary) || (model.ball.y>(game_param.p_right_boundary))))
-				{
-					
-
-				model.ball.dx *= -1;
-				model.ball.x = game_param.paddle_height;
-			}
-			else if(((model.ball.x + game_param.ball_radius + model.ball.dx) > (game_param.right_wall-game_param.paddle_height)) && (model.ball.dx>0) &&
-				(((model.ball.y >= (game_param.bottom_wall-game_param.paddle_width-model.positions[1])) && (model.ball.y <= (game_param.bottom_wall-model.positions[1])))||(model.ball.y<game_param.p_left_boundary) || (model.ball.y>game_param.p_right_boundary))){
-					
-
-				model.ball.dx *= -1;
-				model.ball.x = game_param.right_wall-game_param.paddle_height;
-			}
-
-			else if (((model.ball.y - game_param.ball_radius + model.ball.dy) < game_param.paddle_height) && (model.ball.dy<0) &&
-				(((model.ball.x >= (game_param.right_wall-game_param.paddle_width-model.positions[2])) && (model.ball.x <= (game_param.right_wall-model.positions[2] + game_param.paddle_width)))||(model.ball.x<game_param.p_left_boundary) || (model.ball.x>game_param.p_right_boundary))){
-					
-
-				model.ball.dy *= -1;
-				model.ball.y = game_param.paddle_height;
-
-			}
-			else if (((model.ball.y + game_param.ball_radius + model.ball.dy) > (game_param.bottom_wall-game_param.paddle_height)) && (model.ball.dy>0) &&
-				(((model.ball.x >= model.positions[0]) && (model.ball.x <= (model.positions[0] + game_param.paddle_width)))||(model.ball.x<game_param.p_left_boundary) || (model.ball.x>game_param.p_right_boundary))){
-	
-
-				model.ball.dy *= -1;
-				model.ball.y = game_param.bottom_wall-game_param.paddle_height;
-
-			}
-			else{
-				console.log(model.ball);
-				model.ball.y += model.ball.dy;
-				model.ball.x += model.ball.dx;
-			}
-			
-		}
-	}
-
-}
->>>>>>> Stashed changes
