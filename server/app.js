@@ -21,7 +21,7 @@ function handler (req, res) {
 var model = {
 	positions: [150, 150, 150, 150],
 	actions: [0, 0, 0, 0],
-	ball: {x: 200, y: 200, dx: 1, dy: 0}
+	ball: {x: 200, y: 200, dx: 1, dy: 4}
 }
 
 
@@ -37,8 +37,9 @@ var params = {
 var numPlayers = 0;
 var players = [];
 var idHash = {};
-var velocity = 80;
+var velocity = 150;
 var ballVelocity = 50;
+var all_ready = [0,0,0,0];
 
 io.sockets.on('connection', function (socket) {
 	if (numPlayers < 4){ // Add Player
@@ -48,9 +49,14 @@ io.sockets.on('connection', function (socket) {
 		numPlayers++;
 	}
 
-	if (numPlayers == 4){
-		startGame();
-	}
+	
+
+	socket.on('start_game', function(){
+		all_ready[idHash[socket.id]] = 1;
+		if (JSON.stringify(all_ready)==JSON.stringify([1,1,1,1])){
+			startGame();
+		}
+	})
 
 	socket.on('moveLeft', function (){
 		model.actions[idHash[socket.id]] = 1;
@@ -101,6 +107,11 @@ function updateBall(){
 
 	} else { 
 		console.log(outOfBounds);
+		model = {
+			positions: [150, 150, 150, 150],
+			actions: [0, 0, 0, 0],
+			ball: {x: 200, y: 200, dx: 1, dy: 4}
+		}
 	}
 }
 

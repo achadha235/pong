@@ -39,6 +39,13 @@
 	})
 	socket.on('setPlayerNumber', function (assignment){
 		myPlayer = assignment.yourPlayerNumber
+		console.log('addEventListener');
+		window.addEventListener('keydown', function (e){
+			if (e.keyCode === 83) {
+				socket.emit('start_game',{});
+				console.log('start_game');
+			}
+		});
 	})
 
 	var leftPressed = false;
