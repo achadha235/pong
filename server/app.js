@@ -63,11 +63,11 @@ function startGame(){
 		// Game Update loop 
 		for (var i = 0; i < 4; i++){
 			if (model.actions[i] === 1){
-				var newPos = Math.max(0, model.positions[i] - (velocity * (step/1000)))
+				var newPos = Math.max(50, model.positions[i] - (velocity * (step/1000)))
 				model.positions[i] = Math.round(newPos);
 			}
 			else if (model.actions[i] === 2){
-				var newPos = Math.min(400, model.positions[i] + (velocity * (step/1000)));
+				var newPos = Math.min(150, model.positions[i] + (velocity * (step/1000)));
 				model.positions[i] = Math.round(newPos);
 			}
 		}
