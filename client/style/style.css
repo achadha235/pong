@@ -1,0 +1,23 @@
+body{
+	background: #ffffff;
+	text-align: center;
+}
+
+#myCanvas{
+	background: #3a3a3a;
+}
+
+#leftButton, #rightButton{
+	display: inline-block;
+	width: 135px;
+	height: 135px;
+	margin: 15px auto;
+	margin: 10px;
+}
+
+#screen{
+	height: 565px;
+	width: 400px;
+	text-align: center;
+	background: #3a3a3a;
+}
