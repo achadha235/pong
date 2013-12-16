@@ -41,8 +41,8 @@ var params = {
 	width: 400,
 	radius: 5,
 	border: 50,
-	paddleHeight: 10,
-	paddleWidth: 100,
+	paddleHeight: 15,
+	paddleWidth: 82,
 	recoverTime: 1000
 }
 
@@ -120,14 +120,16 @@ function updateBall(){
 	} else { 
 		console.log(outOfBounds);
 
+		model.ball.x = 200
+		model.ball.y = 200
+		model.ball.dx = 0;
+		model.ball.dy = 0;
+
+
+		var randomX = (Math.random() > 0.5) ?  1 : -1;
+		var randomY = (Math.random() > 0.5) ?  1 : -1;
+
 		setTimeout(function(){
-			// Reset the location of the ball
-			model.ball.x = 200
-			model.ball.y = 200
-
-			var randomX = (Math.random() > 0.5) ?  1 : -1;
-			var randomY = (Math.random() > 0.5) ?  1 : -1;
-
 			if (Math.random() > 0.5) {
 				model.ball.dx = 1 * randomX;
 				model.ball.dy = 4 * randomY;			
@@ -137,7 +139,6 @@ function updateBall(){
 				model.ball.dy = 1 * randomY;				
 			}
 		}, params.recoverTime)
-
 	}
 }
 
