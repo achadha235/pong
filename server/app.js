@@ -5,6 +5,16 @@ var app = require('http').createServer(handler)
 app.listen(3000);
 io.set('log level', 1); // reduce logging
 
+function getRandom(min, max) {
+    return min + Math.floor(Math.random() * (max - min + 1));
+}
+
+function sign(number){
+	if (number >= 0) return 1
+	else return -1
+}
+
+
 function handler (req, res) {
   fs.readFile(__dirname + '/index.html',
   function (err, data) {
@@ -19,6 +29,7 @@ function handler (req, res) {
 
 
 var model = {
+	scores: [0,0,0,0],
 	positions: [150, 150, 150, 150],
 	actions: [0, 0, 0, 0],
 	ball: {x: 200, y: 200, dx: 1, dy: 4}
@@ -31,13 +42,14 @@ var params = {
 	radius: 5,
 	border: 50,
 	paddleHeight: 10,
-	paddleWidth: 100
+	paddleWidth: 100,
+	recoverTime: 1000
 }
 
 var numPlayers = 0;
 var players = [];
 var idHash = {};
-var velocity = 150;
+var velocity = 200;
 var ballVelocity = 50;
 var all_ready = [0,0,0,0];
 
@@ -49,7 +61,7 @@ io.sockets.on('connection', function (socket) {
 		numPlayers++;
 	}
 
-	
+	// if (numPlayers === 4) startGame();
 
 	socket.on('start_game', function(){
 		all_ready[idHash[socket.id]] = 1;
@@ -107,31 +119,63 @@ function updateBall(){
 
 	} else { 
 		console.log(outOfBounds);
-		model = {
-			positions: [150, 150, 150, 150],
-			actions: [0, 0, 0, 0],
-			ball: {x: 200, y: 200, dx: 1, dy: 4}
-		}
+
+		setTimeout(function(){
+			// Reset the location of the ball
+			model.ball.x = 200
+			model.ball.y = 200
+
+			var randomX = (Math.random() > 0.5) ?  1 : -1;
+			var randomY = (Math.random() > 0.5) ?  1 : -1;
+
+			if (Math.random() > 0.5) {
+				model.ball.dx = 1 * randomX;
+				model.ball.dy = 4 * randomY;			
+			} 
+			else {
+				model.ball.dx = 4 * randomX;
+				model.ball.dy = 1 * randomY;				
+			}
+		}, params.recoverTime)
+
 	}
 }
 
 function deflectBall(){
+
+	var c = 0.1;
 	var top = model.ball.y - params.radius;
 	var bottom = model.ball.y + params.radius;
 	var left = model.ball.x - params.radius;
 	var right = model.ball.x + params.radius;
 
 	if (bottom >= (params.height - params.paddleHeight) && model.ball.dy > 0){ // Range for delfection
-		if ((model.positions[0] <= model.ball.x &&  model.ball.x <= model.positions[0]+params.paddleWidth)) model.ball.dy *= -1; // Make sure paddle is 
+		if ((model.positions[0] <= model.ball.x &&  model.ball.x <= model.positions[0]+params.paddleWidth)) {
+			model.ball.dy *= -1;
+			var diff = model.ball.x - (model.positions[0] + (params.paddleWidth/2));
+			model.ball.dx  = diff * c;
+		}
 	}
 	else if (right>= params.width - params.paddleHeight && model.ball.dx > 0){
-		if (((params.height-params.paddleWidth-model.positions[1]) <= model.ball.y &&  model.ball.y <= params.height-model.positions[1])) model.ball.dx *= -1;
+		if (((params.height-params.paddleWidth-model.positions[1]) <= model.ball.y &&  model.ball.y <= params.height-model.positions[1])) {
+			model.ball.dx *= -1;
+			var diff = model.ball.y - (params.height-(params.paddleWidth/2)-model.positions[1]);
+			model.ball.dy  = diff * c;
+		}
 	}
 	else if (top <= params.paddleHeight && top >= 0 && model.ball.dy < 0){
-		if (((params.width-params.paddleWidth-model.positions[2]) <= model.ball.x &&  model.ball.x <= params.width-model.positions[2])) model.ball.dy *= -1;
+		if (((params.width-params.paddleWidth-model.positions[2]) <= model.ball.x &&  model.ball.x <= params.width-model.positions[2])) {
+			model.ball.dy *= -1;
+			var diff = model.ball.x - (params.width-(params.paddleWidth/2)-model.positions[2]);
+			model.ball.dx  = diff * c;
+		}
 	}	
 	else if (left <= params.paddleHeight && left >= 0 && model.ball.dx < 0){
-		if ((model.positions[3] <= model.ball.y &&  model.ball.y <= model.positions[3]+params.paddleWidth)) model.ball.dx *= -1;
+		if ((model.positions[3] <= model.ball.y &&  model.ball.y <= model.positions[3]+params.paddleWidth)) {
+			model.ball.dx *= -1;
+			var diff = model.ball.y - (model.positions[3] + (params.paddleWidth/2));
+			model.ball.dy  = diff * c;	
+		}
 	}	
 }
 

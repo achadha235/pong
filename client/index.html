@@ -1,22 +1,53 @@
 <html>
 	<head>
 		<script src="js/socket.io.js"> </script>
+		<meta name="viewport" content="width=device-width, initial-scale=1.5, maximum-scale=1.5, user-scalable=no" />
 	</head>
 
 	<body>
 		<div id='status'> </div>
 		<canvas id="myCanvas" width="400" height="400"></canvas>
+		<div id='buttons'>
+			<button id='leftButton' class='button'> L </button>
+			<button id='rightButton' class='button'> R </button>
+		</div>
 	</body>
 </html>
+
+<style>
+	body {
+		overflow: hidden;
+	}
+	#buttons{
+		width: 400px;
+		height: 300px;
+	}
+
+	.button {
+		margin-left: 3%;
+		margin-top: 5px;
+		float:left;
+		height:180px;
+		width: 180px;
+		background-color: black;
+		color: white;
+	}
+</style>
 
 
 <script>
 
-	var data ;
-	var socket = io.connect('http://localhost:3000');
+	var socket = io.connect('http://192.168.8.107:3000');
 	var canvas = document.getElementById('myCanvas');
 	var ctx = canvas.getContext("2d");
 	var myPlayer;
+
+
+	var data = {
+	positions: [150, 150, 150, 150],
+	actions: [0, 0, 0, 0],
+	ball: {x: 200, y: 200, dx: 1, dy: 4}
+	}
 
 
 	var params = {
@@ -33,19 +64,29 @@
 
 	socket.on('update', function (model){
 		data = model;
-		console.log('updating model...');
+		//console.log('updating model...');
 		updateTable();
 		drawAll();
 	})
 	socket.on('setPlayerNumber', function (assignment){
 		myPlayer = assignment.yourPlayerNumber
-		console.log('addEventListener');
+		drawAll();                                                                                                                                               
+		//console.log('addEventListener');
 		window.addEventListener('keydown', function (e){
 			if (e.keyCode === 83) {
 				socket.emit('start_game',{});
-				console.log('start_game');
+				//console.log('start_game');
 			}
 		});
+
+		window.addEventListener('keydown', function (e){
+			if (e.keyCode === 83) {
+				socket.emit('start_game',{});
+				//console.log('start_game');
+			}
+		});
+
+
 	})
 
 	var leftPressed = false;
@@ -73,11 +114,47 @@
 	    }
 	}, false);
 
-	function updateTable(){
-		console.log(data);
-		document.getElementById('status').innerHTML = JSON.stringify(data);
+	var elements = document.getElementsByClassName('button')
+	for (var i = 0; i < elements.length; i++){
+
+		var element = elements[i];
+		element.addEventListener('touchend', function (e) {
+	    	if (e.target.id === "leftButton") {
+	    		leftPressed = false;
+		        socket.emit('stop', {});
+		    }
+		    else if (e.target.id === "rightButton"){
+		    		  console.log('r STop')
+
+		    	rightPressed = false;
+		    	socket.emit('stop', {});
+		    }
+		}, false);
+
+		element.addEventListener('touchstart', function (e) {
+	    	if (e.target.id === "leftButton" && !leftPressed && !rightPressed) {
+	    		console.log('LEFT START')
+	    		leftPressed = true;
+		        socket.emit('moveLeft', {});
+		    }
+		    else if (e.target.id === "rightButton" && !leftPressed && !rightPressed){
+		    		    		console.log('r START')
+
+		    	rightPressed = true;
+		    	socket.emit('moveRight', {});
+		    }
+		}, false);
 	}
 
+	document.getElementById("myCanvas").addEventListener('touchstart', function (e){
+		console.log('Starting game....')
+		socket.emit('start_game',{});
+	})
+
+	function updateTable(){
+		//console.log(data);
+		document.getElementById('status').innerHTML = JSON.stringify(data);
+	}
 
 	function drawAll() {
 		//console.log('drawAll');
@@ -94,7 +171,7 @@
 
 	function drawPaddles(){//p1_x p1_y ...
 		//Paddle 0
-		console.log('Drawing paddles')
+		//console.log('Drawing paddles')
 		ctx.fillStyle=params.colors[myPlayer];
 		ctx.fillRect(data.positions[myPlayer], params.height-params.paddleHeight, params.paddleWidth, params.paddleHeight);
 
@@ -113,7 +190,7 @@
 
 	function drawBall(){//data.ball.x, data.ball.y....
 		ctx.beginPath();
-		ctx.arc(params.ball.x, params.ball.y, params.radius, 0, Math.PI*2, true); 
+		ctx.arc(Math.round(params.ball.x), Math.round(params.ball.y), params.radius, 0, Math.PI*2, true); 
 		ctx.closePath();
 		ctx.fillStyle = 'white';
 		ctx.fill();
