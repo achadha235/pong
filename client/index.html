@@ -1,11 +1,17 @@
 <html>
 	<head>
+		<link href="style/style.css" rel="stylesheet" type="text/css">
 		<script src="js/socket.io.js"> </script>
 	</head>
-
 	<body>
 		<div id='status'> </div>
+		<div id = 'screen'>
 		<canvas id="myCanvas" width="400" height="400"></canvas>
+		<div id = 'controller'>
+			<img id ='leftButton' src = 'style/leftButton.png'></img>
+			<img id ='rightButton' src = 'style/rightButton.png'></img>
+		</div>
+	</div>
 	</body>
 </html>
 
@@ -18,15 +24,34 @@
 	var ctx = canvas.getContext("2d");
 	var myPlayer;
 
+	var ball = new Image();
+	ball.src = 'style/spriteSheet.png';
+
+	var paddle1 = new Image();
+	paddle1.src = 'style/Paddle1.png';
+	
+	var paddle2 = new Image();
+	paddle2.src = 'style/Paddle2.png';
+	
+	var paddle3 = new Image();
+	paddle3.src = 'style/Paddle3.png';
+	
+	var paddle4 = new Image();
+	paddle4.src = 'style/Paddle4.png';
+
+	var corners = new Image();
+	corners.src = 'style/Corners.png'
+
 
 	var params = {
 		height: 400,
 		width: 400,
 		radius: 5,
 		border: 50,
-		paddleHeight: 10,
-		paddleWidth: 100,
+		paddleHeight: 15,
+		paddleWidth: 84,
 		colors: ["#F0F000","#00F0F0","#F000F0","#00FF00"],
+		paddles: [paddle1, paddle2, paddle3, paddle4],
 		ball: {x:200, y:200}
 	}
 
@@ -88,35 +113,39 @@
 	}
 
 	function drawBackground(){
-		ctx.fillStyle="#000000";
-		ctx.fillRect(0, 0, 400, 400);
+		ctx.fillStyle="#3a3a3a";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		ctx.fillStyle="#1f1f1f";
+		ctx.fillRect(0, 0, canvas.width, 7);
+		ctx.fillStyle="#4b4b4b";
+		ctx.fillRect(0, canvas.height-6, canvas.width, 7);
+		ctx.fillStyle="#2c2c2c";
+		ctx.fillRect(0, 0, 7, canvas.height);
+		ctx.fillRect(canvas.width-6, 0, 7, canvas.height);
+		ctx.fillStyle="#111111";
+		ctx.fillRect(7, 7, canvas.width-14, canvas.height-14);
+		ctx.drawImage(corners, 0, 0, 22, 22, 0, 0, 22, 22);
+		ctx.drawImage(corners, 23, 0, 22, 22, canvas.width-21, 0, 22, 22);
+		ctx.drawImage(corners, 0, 23, 22, 22, 0, canvas.height-21, 22, 22);
+		ctx.drawImage(corners, 23, 23, 22, 22, canvas.width-21, canvas.height-21, 22, 22);
 	}
 
 	function drawPaddles(){//p1_x p1_y ...
 		//Paddle 0
-		console.log('Drawing paddles')
-		ctx.fillStyle=params.colors[myPlayer];
-		ctx.fillRect(data.positions[myPlayer], params.height-params.paddleHeight, params.paddleWidth, params.paddleHeight);
+		ctx.drawImage(params.paddles[myPlayer], 0, 84, 84, 15, data.positions[myPlayer], params.height-params.paddleHeight, 84, 15);
 
 		//Paddle 1
-		ctx.fillStyle=params.colors[(myPlayer+1)%4];
-		ctx.fillRect(params.width-params.paddleHeight, params.height-params.paddleWidth-data.positions[(myPlayer+1)%4], params.paddleHeight, params.paddleWidth);
+		ctx.drawImage(params.paddles[(myPlayer+1)%4], 0, 0, 15, 84, params.width-params.paddleHeight, params.height-params.paddleWidth-data.positions[(myPlayer+1)%4], 15, 84);
 
 		//Paddle 2
-		ctx.fillStyle= params.colors[(myPlayer+2)%4];
-		ctx.fillRect(params.width-params.paddleWidth-data.positions[(myPlayer+2)%4], 0, params.paddleWidth, params.paddleHeight);
+		ctx.drawImage(params.paddles[(myPlayer+2)%4], 0, 99, 84, 15, params.width-params.paddleWidth-data.positions[(myPlayer+2)%4], 0, 84, 15);
 
 		//Paddle 3
-		ctx.fillStyle=params.colors[(myPlayer+3)%4];
-		ctx.fillRect(0, data.positions[(myPlayer+3)%4], params.paddleHeight, params.paddleWidth);
+		ctx.drawImage(params.paddles[(myPlayer+3)%4], 15, 0, 15, 84, 0, data.positions[(myPlayer+3)%4], 15, 84);
 	}
 
 	function drawBall(){//data.ball.x, data.ball.y....
-		ctx.beginPath();
-		ctx.arc(params.ball.x, params.ball.y, params.radius, 0, Math.PI*2, true); 
-		ctx.closePath();
-		ctx.fillStyle = 'white';
-		ctx.fill();
+	ctx.drawImage(ball, 6, 6, 17, 17, params.ball.x, params.ball.y, 17, 17);
 	}
 
 	function relBallPos(){
