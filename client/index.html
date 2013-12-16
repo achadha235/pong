@@ -13,6 +13,8 @@
 			<img id ='rightButton' src = 'style/rightButton.png'></img>
 		</div>
 	</div>
+	<div id='status'> </div>
+
 	</body>
 </html>
 
@@ -86,7 +88,7 @@
 	socket.on('update', function (model){
 		data = model;
 		//console.log('updating model...');
-		//updateTable();
+		updateTable();
 		drawAll();
 	})
 	socket.on('setPlayerNumber', function (assignment){

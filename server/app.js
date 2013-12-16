@@ -29,10 +29,11 @@ function handler (req, res) {
 
 
 var model = {
-	scores: [0,0,0,0],
+	lives: [5,5,5,5],
+	scores: [0, 0, 0, 0],
 	positions: [150, 150, 150, 150],
 	actions: [0, 0, 0, 0],
-	ball: {x: 200, y: 200, dx: 1, dy: 4}
+	ball: {x: 200, y: 200, dx: 0.1, dy: 0.4}
 }
 
 
@@ -116,30 +117,52 @@ function updateBall(){
 	if (!outOfBounds){
 		// RESET
 		deflectBall()
-
 	} else { 
-		console.log(outOfBounds);
-
-		model.ball.x = 200
-		model.ball.y = 200
-		model.ball.dx = 0;
-		model.ball.dy = 0;
-
-
-		var randomX = (Math.random() > 0.5) ?  1 : -1;
-		var randomY = (Math.random() > 0.5) ?  1 : -1;
-
-		setTimeout(function(){
-			if (Math.random() > 0.5) {
-				model.ball.dx = 1 * randomX;
-				model.ball.dy = 4 * randomY;			
-			} 
-			else {
-				model.ball.dx = 4 * randomX;
-				model.ball.dy = 1 * randomY;				
-			}
-		}, params.recoverTime)
+		updateLives(outOfBounds);
+		resetBall();
 	}
+}
+
+function resetBall(){
+	model.ball.x = 200
+	model.ball.y = 200
+	model.ball.dx = 0;
+	model.ball.dy = 0;
+
+
+	var randomX = (Math.random() > 0.5) ?  1 : -1;
+	var randomY = (Math.random() > 0.5) ?  1 : -1;
+
+	setTimeout(function(){
+		if (Math.random() > 0.5) {
+			model.ball.dx = 0.1 * randomX;
+			model.ball.dy = 0.4 * randomY;			
+		} 
+		else {
+			model.ball.dx = 0.4 * randomX;
+			model.ball.dy = 0.1 * randomY;				
+		}
+	}, params.recoverTime)	
+}
+
+function updateLives(outOfBoundPlayer){
+	model.lives[outOfBoundPlayer - 1] -= 1;
+	if (model.lives[outOfBoundPlayer - 1] <= 0){
+		updateScores();
+	}
+	io.sockets.emit('update', model);
+}
+
+function updateScores(){
+	console.log('updating scores...');
+	for (var i = 0; i < model.lives.length; i++){
+		model.scores[i] += model.lives[i];
+	}
+	model.lives = [5, 5, 5, 5];
+};
+
+function resetRound(){
+
 }
 
 function deflectBall(){
