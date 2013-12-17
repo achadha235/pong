@@ -2,17 +2,27 @@
 	<head>
 		<link href="style/style.css" rel="stylesheet" type="text/css">
 		<script src="js/socket.io.js"> </script>
-		<meta name="viewport" content="width=device-width, initial-scale=1.5, maximum-scale=1.5, user-scalable=no" />
+		<link href='http://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'>
+		<meta name="viewport" content="width=device-width, initial-scale=1.5, maximum-scale=1.5, user-scalable=no"/>
 	</head>
 	<body>
 		<div id = 'screen'>
 		<canvas id="myCanvas" width="400" height="400"></canvas>
 
+<div id = 'lives'>
+		<div id = 'p1lives'></div>
+		<div id = 'p2lives'></div>
+		<div id = 'p3lives'></div>
+		<div id = 'p4lives'></div>
+	</div>
+
 		<div id = 'controller'>
 			<img id ='leftButton' src = 'style/leftButton.png'></img>
 			<img id ='rightButton' src = 'style/rightButton.png'></img>
 		</div>
+
 	</div>
+	
 	<div id='status'> </div>
 
 	</body>
@@ -47,7 +57,7 @@
 	var myPlayer;
 
 	var ball = new Image();
-	ball.src = 'style/spriteSheet.png';
+	ball.src = 'style/ball.png';
 
 	var paddle1 = new Image();
 	paddle1.src = 'style/Paddle1.png';
@@ -66,9 +76,11 @@
 
 
 	var data = {
-	positions: [150, 150, 150, 150],
-	actions: [0, 0, 0, 0],
-	ball: {x: 200, y: 200, dx: 1, dy: 4}
+		lives: [5,5,5,5],
+		scores: [0, 0, 0, 0],
+		positions: [150, 150, 150, 150],
+		actions: [0, 0, 0, 0],
+		ball: {x: 200, y: 200, dx: 0.1, dy: 0.4}
 	}
 
 
@@ -79,7 +91,7 @@
 		border: 50,
 		paddleHeight: 15,
 		paddleWidth: 82,
-		colors: ["#F0F000","#00F0F0","#F000F0","#00FF00"],
+		colors: ["#1cf1ec","#e9f40f","#ff7448","#67e767"],
 		paddles: [paddle1, paddle2, paddle3, paddle4],
 		ball: {x:200, y:200}
 	}
@@ -182,19 +194,34 @@
 	function drawAll() {
 		console.log('drawAll');
 		drawBackground();
+		drawLives();
 		drawPaddles();
 		relBallPos();
 		drawBall();
 	}
 
+	function drawLives(){
+		document.getElementById("p1lives").style.color=params.colors[myPlayer];
+		document.getElementById("p1lives").innerHTML= data.lives[myPlayer];
+		document.getElementById("p2lives").style.color=params.colors[(myPlayer+1)%4];
+		document.getElementById("p2lives").innerHTML= data.lives[(myPlayer+1)%4];
+		document.getElementById("p3lives").style.color=params.colors[(myPlayer+2)%4];
+		document.getElementById("p3lives").innerHTML= data.lives[(myPlayer+2)%4];
+		document.getElementById("p4lives").style.color=params.colors[(myPlayer+3)%4];
+		document.getElementById("p4lives").innerHTML= data.lives[(myPlayer+3)%4];
+	}
+
 	function drawBackground(){
 		ctx.fillStyle="#3a3a3a";
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
-		ctx.fillStyle="#1f1f1f";
+		//top
+		ctx.fillStyle="#1d1b10";
 		ctx.fillRect(0, 0, canvas.width, 7);
-		ctx.fillStyle="#4b4b4b";
+		//bottom
+		ctx.fillStyle="#5f583a";
 		ctx.fillRect(0, canvas.height-6, canvas.width, 7);
-		ctx.fillStyle="#2c2c2c";
+		//sides
+		ctx.fillStyle="#332a1f";
 		ctx.fillRect(0, 0, 7, canvas.height);
 		ctx.fillRect(canvas.width-6, 0, 7, canvas.height);
 		ctx.fillStyle="#111111";
@@ -221,7 +248,7 @@
 	}
 
 	function drawBall(){//data.ball.x, data.ball.y....
-	ctx.drawImage(ball, 6, 6, 17, 17, params.ball.x, params.ball.y, 17, 17);
+	ctx.drawImage(ball, params.ball.x, params.ball.y);
 	}
 
 	function relBallPos(){

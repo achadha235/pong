@@ -1,23 +1,68 @@
 body{
 	background: #ffffff;
 	text-align: center;
+	font-family: 'Press Start 2P', cursive;
 }
 
 #myCanvas{
-	background: #3a3a3a;
+	margin: 15px;
+	position: relative;
+	background: #332a1f;
 }
 
 #leftButton, #rightButton{
 	display: inline-block;
 	width: 135px;
 	height: 135px;
-	margin: 15px auto;
-	margin: 10px;
+	margin: auto;
+	margin-left: 10px;
+	margin-right: 10px;
 }
 
 #screen{
-	height: 565px;
-	width: 400px;
+	height: 590px;
+	width: 445px;
 	text-align: center;
-	background: #3a3a3a;
+	background: #7b7555;
+}
+
+#lives{
+	font-size: 16px;
+	position: absolute;
+	top:0px;
+	width: 415px;
+	height: 415px;
+	margin: 15px;
+}
+
+#p1lives{
+	width: 16px;
+	height: 16px;
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+}
+
+#p2lives{
+		width: 16px;
+	height: 16px;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+
+#p3lives{
+		width: 16px;
+	height: 16px;
+	position: absolute;
+	top:0px;
+	left: 0px;
+}
+
+#p4lives{
+		width: 16px;
+	height: 16px;
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
 }
