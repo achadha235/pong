@@ -2,19 +2,22 @@
 	<head>
 		<link href="style/style.css" rel="stylesheet" type="text/css">
 		<script src="js/socket.io.js"> </script>
-		<meta name="viewport" content="width=device-width, initial-scale=1.5, maximum-scale=1.5, user-scalable=no" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
 	</head>
 	<body>
 		<div id = 'screen'>
 		<canvas id="myCanvas" width="400" height="400"></canvas>
 
 		<div id = 'controller'>
-			<img id ='leftButton' src = 'style/leftButton.png'></img>
-			<img id ='rightButton' src = 'style/rightButton.png'></img>
+			<img id ='leftButton' class='button' src = 'style/leftButton.png'></img>
+			<img id ='rightButton' class='button' src = 'style/rightButton.png'></img>
 		</div>
 	</div>
-	<div id='status'> </div>
 
+	<div id='status'> </div>
 	</body>
 </html>
 
@@ -27,21 +30,17 @@
 		height: 300px;
 	}
 
-	.button {
-		margin-left: 3%;
-		margin-top: 5px;
-		float:left;
-		height:180px;
-		width: 180px;
-		background-color: black;
-		color: white;
-	}
+
+
 </style>
 
 
 <script>
+	document.ontouchmove = function(event){
+    	event.preventDefault();
+	}
 
-	var socket = io.connect('http://localhost:3000');
+	var socket = io.connect('http://192.168.1.6:3000');
 	var canvas = document.getElementById('myCanvas');
 	var ctx = canvas.getContext("2d");
 	var myPlayer;
